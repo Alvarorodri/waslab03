@@ -48,6 +48,15 @@ function deleteHandler(tweetID) {
 	 * TASK #4 
 
 	 */	
+	req = new XMLHttpRequest();
+	req.open('DELETE', tweetsURI+"/"+tweetID, /*async*/true);
+	req.onload = function() { 
+		if (req.status == 200) { // 200 OK
+			document.getElementById("tweet_"+tweetID).remove();
+			//document.getElementById(target).getElementsByClassName("numlikes")[0].innerHTML = req.responseText;
+		}
+	};
+	req.send(/*no params*/null);
 }
 
 function getTweetHTML(tweet, action) {  // action :== "like" xor "delete"
