@@ -107,8 +107,9 @@ public class WallServlet extends HttpServlet {
 			throws IOException, ServletException {
 
 		String uri = req.getRequestURI();
-		long id = Long.valueOf(uri.substring(TWEETS_URI.length()));
-		Database.deleteTweet(id);
+		long id = Long.valueOf(uri.substring(TWEETS_URI.length(), uri.length()));
+		if (!req.getHeader("Authorization").equals(null) && req.getHeader("Authorization").equals(convertirMD5(String.valueOf(id)))) 
+			Database.deleteTweet(id);
 		//throw new ServletException("DELETE not yet implemented");
 	}
 

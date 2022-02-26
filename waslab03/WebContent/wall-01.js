@@ -53,9 +53,11 @@ function deleteHandler(tweetID) {
 	req.onload = function() { 
 		if (req.status == 200) { // 200 OK
 			document.getElementById("tweet_"+tweetID).remove();
+			localStorage.removeItem("token"+tweetID);
 			//document.getElementById(target).getElementsByClassName("numlikes")[0].innerHTML = req.responseText;
 		}
 	};
+	req.setRequestHeader("Authorization",localStorage.getItem("token"+tweetID));
 	req.send(/*no params*/null);
 }
 
@@ -77,8 +79,13 @@ function getTweets() {
 			 */
 			tweet_list = JSON.parse(tweet_list);
 			var ttHTML = '';
-			tweet_list.forEach(tt => ttHTML += getTweetHTML(tt, "like"));
-			document.getElementById("tweet_list").innerHTML = ttHTML;
+			tweet_list.forEach(function(tt){
+				if ((localStorage.getItem("token"+tt.id)!= null))
+					document.getElementById("tweet_list").innerHTML += getTweetHTML(tt, "delete");
+				else document.getElementById("tweet_list").innerHTML += getTweetHTML(tt, "like");
+			});
+			
+			//document.getElementById("tweet_list").innerHTML = ttHTML;
 		}
 	};
 	req.send(null); 
@@ -97,10 +104,9 @@ function tweetHandler() {
 
 		if (req.status == 200) { // 200 OK
 			var nt = JSON.parse(req.responseText);
-			var token = nt['token'];
-			var id = nt['id'];
+			var token = nt.token;
+			var id = nt.id;
 			localStorage.setItem("token"+id, token);
-			localStorage.setItem("id"+id, id);
 			nt = getTweetHTML(nt, "delete");
 			document.getElementById("tweet_list").innerHTML = nt + document.getElementById("tweet_list").innerHTML;			
 		}
