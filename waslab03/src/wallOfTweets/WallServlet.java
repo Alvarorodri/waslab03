@@ -1,6 +1,8 @@
 package wallOfTweets;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -67,7 +69,10 @@ public class WallServlet extends HttpServlet {
 				JSONObject tweet = new JSONObject(body);
 				
 				Tweet tt = Database.insertTweet(tweet.getString("author"),tweet.getString("text"));
+				String idT = convertirMD5(tt.getId().toString());
+				
 				JSONObject ntt = new JSONObject(tt);
+				ntt.put("token", idT);
 				resp.getWriter().println(ntt.toString());
 
 			} catch (JSONException e) {
@@ -76,6 +81,24 @@ public class WallServlet extends HttpServlet {
 			}
 			
 		}
+	}
+	
+	private String convertirMD5(String contra) {
+		MessageDigest mdigest = null;
+		try {
+			mdigest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		byte[] hash = mdigest.digest(contra.getBytes());
+		StringBuffer s = new StringBuffer();
+		
+		for (byte b: hash) {
+			s.append(Integer.toHexString((b & 0xFF) | 0x100).substring(1,3));		
+		}
+		return s.toString();
 	}
 	
 	@Override
